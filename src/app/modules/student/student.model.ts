@@ -1,7 +1,5 @@
 import { model, Schema } from "mongoose";
 import { TGuardian, TLocalGuardian, TStudent, TStudentModel, TUserName } from "./student.interface";
-import bcrypt from "bcrypt";
-import config from "../../config";
 
 const userNameSchema = new Schema<TUserName>({
     firstName: { type: String, required: [true, 'First name is required'] },
@@ -27,7 +25,12 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 
 const studentSchema = new Schema<TStudent, TStudentModel>({
     id: { type: String, required: true, unique: true },
-    password: { type: String, required: true, maxlength: [20, 'Password can not be more than 20 characters'] },
+    user: {
+        type: Schema.Types.ObjectId,
+        required: [true, "User ID is required"],
+        unique: true,
+        ref: "User"
+    },
     name: { type: userNameSchema, required: [true, 'Student name is required'] },
     gender: {
         type: String,
@@ -54,14 +57,6 @@ const studentSchema = new Schema<TStudent, TStudentModel>({
     guardian: { type: guardianSchema, required: [true, 'Guardian information is required'] },
     localGuardian: { type: localGuardianSchema, required: [true, 'Local guardian information is required'] },
     profileImg: { type: String },
-    isActive: {
-        type: String,
-        enum: {
-            values: ['active', 'blocked'],
-            message: 'Status must be either active or blocked'
-        },
-        default: 'active'
-    },
     isDeleted: { type: Boolean, default: false }
 }, { toJSON: { virtuals: true } });
 
@@ -69,19 +64,6 @@ const studentSchema = new Schema<TStudent, TStudentModel>({
 studentSchema.virtual('fullName').get(function () {
     return `${this.name.firstName} ${this.name.lastName} ${this.name.lastName}`;
 })
-
-// pre middleware
-studentSchema.pre('save', async function (next) {
-    const user = this;
-    user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt_round));
-    next();
-});
-
-// post middleware
-studentSchema.post('save', async function (doc, next) {
-    doc.password = '';
-    next();
-});
 
 // query middleware
 studentSchema.pre('find', function (next) {
