@@ -40,7 +40,7 @@ const studentSchema = new Schema<TStudent, TStudentModel>({
         },
         required: [true, 'Gender is required']
     },
-    dateOfBirth: { type: Date},
+    dateOfBirth: { type: Date },
     email: { type: String, required: [true, 'Email is required'], unique: true },
     contactNo: { type: String, required: [true, 'Contact number is required'] },
     emergencyContactNo: { type: String, required: [true, 'Emergency contact number is required'] },
@@ -57,6 +57,10 @@ const studentSchema = new Schema<TStudent, TStudentModel>({
     guardian: { type: guardianSchema, required: [true, 'Guardian information is required'] },
     localGuardian: { type: localGuardianSchema, required: [true, 'Local guardian information is required'] },
     profileImg: { type: String },
+    admissionSemester: {
+        type: Schema.Types.ObjectId,
+        ref: "AcademicSemester"
+    },
     isDeleted: { type: Boolean, default: false }
 }, { toJSON: { virtuals: true } });
 
