@@ -3,6 +3,7 @@ import cors from "cors";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import notFound from "./app/middlewares/notFound";
 import router from "./app/routes";
+import httpStatus from "http-status";
 
 const app: Application = express();
 
@@ -13,8 +14,8 @@ app.use(cors());
 // application routes
 app.use('/api/v1', router);
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('PH-HealthCare Server is Running');
+app.get('/', async (req: Request, res: Response) => {
+    res.status(httpStatus.OK).json({ server: 'PH-HealthCare Server is Running' })
 });
 
 // global error handler
