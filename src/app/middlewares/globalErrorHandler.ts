@@ -5,6 +5,8 @@ import { TErrorSources } from "../interface/error";
 import config from "../config";
 import handleZodError from "../errors/handleZodError";
 import handleValidationError from "../errors/handleValidationError";
+import handleCastError from "../errors/handleCastError";
+import handleDuplicateError from "../errors/handleDuplicateError";
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     let statusCode = err.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
@@ -21,6 +23,16 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
         errorSources = simplefiedError?.errorSources;
     } else if (err.name === 'ValidationError') {
         const simplefiedError = handleValidationError(err);
+        statusCode = simplefiedError?.statusCode;
+        message = simplefiedError?.message;
+        errorSources = simplefiedError?.errorSources;
+    } else if (err?.name === 'CastError') {
+        const simplefiedError = handleCastError(err);
+        statusCode = simplefiedError?.statusCode;
+        message = simplefiedError?.message;
+        errorSources = simplefiedError?.errorSources;
+    } else if (err?.code === 11000) {
+        const simplefiedError = handleDuplicateError(err);
         statusCode = simplefiedError?.statusCode;
         message = simplefiedError?.message;
         errorSources = simplefiedError?.errorSources;

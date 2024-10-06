@@ -1,8 +1,8 @@
 import httpStatus from "http-status";
 import { Error } from "mongoose";
-import { TErrorSources } from "../interface/error";
+import { TErrorSources, TGenericErrorResponse } from "../interface/error";
 
-const handleValidationError = (err: Error.ValidationError) => {
+const handleValidationError = (err: Error.ValidationError): TGenericErrorResponse => {
     const statusCode = httpStatus.NOT_FOUND;
     const errorSources: TErrorSources = Object.values(err.errors).map((val: Error.ValidatorError | Error.CastError) => {
         return {
