@@ -4,24 +4,50 @@ import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
 import { User } from "../user/user.model";
 import { TStudent } from "./student.interface";
+import { ExcludeField, StudentSearchAbleFields } from "./student.constant";
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
+    const queryObj = { ...query };
+
     let searchTerm = '';
     if (query?.searchTerm) {
         searchTerm = query.searchTerm as string;
     }
 
-    const result = await Student.find({
-        $or: ['email', 'name.firstName', 'presentAddress'].map(field => ({
+    // Searching
+    const searchQuery = Student.find({
+        $or: StudentSearchAbleFields.map(field => ({
             [field]: { $regex: searchTerm, $options: 'i' }
         }))
-    }).populate('admissionSemester').populate({
+    });
+
+    // Filtering
+    ExcludeField.forEach(element => delete queryObj[element]);
+
+    const filterQuery = searchQuery.find(queryObj).populate('admissionSemester').populate({
         path: 'academicDepartment',
         populate: {
             path: 'academicFaculty'
         }
     });
-    return result;
+
+    // sort
+    let sort = '-createdAt';
+    if (query?.sort) {
+        sort = query?.sort as string;
+    }
+
+    const sortQuery = filterQuery.sort(sort);
+
+    // limit
+    let limit = 1;
+    if (query?.limit) {
+        limit = query?.limit as number;
+    }
+
+    const limitQuery = await sortQuery.limit(limit);
+
+    return limitQuery;
 }
 
 const getSingleStudentFromDB = async (id: string) => {

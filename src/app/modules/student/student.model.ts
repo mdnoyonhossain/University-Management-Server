@@ -66,7 +66,7 @@ const studentSchema = new Schema<TStudent, TStudentModel>({
         ref: "AcademicDepartment"
     },
     isDeleted: { type: Boolean, default: false }
-}, { toJSON: { virtuals: true } });
+}, { timestamps: true, toJSON: { virtuals: true } });
 
 // vartual
 studentSchema.virtual('fullName').get(function () {
