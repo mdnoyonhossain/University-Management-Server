@@ -7,7 +7,6 @@ import { TStudent } from "./student.interface";
 import { ExcludeField, StudentSearchAbleFields } from "./student.constant";
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-    console.log(query);
     const queryObj = { ...query };
 
     let searchTerm = '';
@@ -24,7 +23,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
 
     // Filtering
     ExcludeField.forEach(element => delete queryObj[element]);
-    console.log({ query, queryObj });
+    
     const filterQuery = searchQuery.find(queryObj).populate('admissionSemester').populate({
         path: 'academicDepartment',
         populate: {

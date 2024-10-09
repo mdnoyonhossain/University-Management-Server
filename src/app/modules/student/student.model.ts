@@ -70,7 +70,7 @@ const studentSchema = new Schema<TStudent, TStudentModel>({
 
 // vartual
 studentSchema.virtual('fullName').get(function () {
-    return `${this.name.firstName} ${this.name.lastName} ${this.name.lastName}`;
+    return `${this?.name?.firstName} ${this?.name?.lastName} ${this?.name?.lastName}`;
 })
 
 // query middleware
