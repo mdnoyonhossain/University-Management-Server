@@ -2,4 +2,4 @@
 export const StudentSearchAbleFields = ['email', 'name.firstName', 'presentAddress'];
 
 // Filtering
-export const ExcludeField = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
+export const ExcludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
