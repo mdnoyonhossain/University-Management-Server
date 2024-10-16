@@ -7,7 +7,7 @@ import QueryBuilder from "../../builder/QueryBuilder";
 import { RegistrationStatus } from "./semesterRegistration.constant";
 
 const createSemesterRegistrationIntoDB = async (payload: TSemesterRegistration) => {
-    const isThereAnyUpcomingOrOngoingSemester = await SemesterRegistration.findOne({ $or: [{ status: "UPCOMING" }, { status: "ONGOING" }] });
+    const isThereAnyUpcomingOrOngoingSemester = await SemesterRegistration.findOne({ $or: [{ status: RegistrationStatus.UPCOMING }, { status: RegistrationStatus.ONGOING }] });
     if (isThereAnyUpcomingOrOngoingSemester) {
         throw new AppError(httpStatus.BAD_REQUEST, `There is already an ${isThereAnyUpcomingOrOngoingSemester?.status} Registered Semester!`);
     }
