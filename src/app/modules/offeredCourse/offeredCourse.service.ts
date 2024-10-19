@@ -8,6 +8,8 @@ import { AcademicDepartment } from "../academicDepartment/academicDepartment.mod
 import { Course } from "../Course/course.model";
 import { Faculty } from "../Faculty/faculty.model";
 import { hasTimeConflict } from "./offeredCourse.utils";
+import QueryBuilder from "../../builder/QueryBuilder";
+import { startSession } from "mongoose";
 
 const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
     const { semesterRegistration, academicFaculty, academicDepartment, course, faculty, section, days, startTime, endTime } = payload;
@@ -65,6 +67,17 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
     return result;
 }
 
+const getAllOfferedCourseFromDB = async (query: Record<string, unknown>) => {
+    const offeredCourseQuery = await new QueryBuilder(OfferedCourse.find(), query).filter().sort().paginate().fields();
+    const result = await offeredCourseQuery.modelQuery;
+    return result;
+}
+
+const getSingleOfferedCourseFromDB = async (id: string) => {
+    const result = await OfferedCourse.findById(id);
+    return result;
+}
+
 const updateOfferedCourseIntoDB = async (id: string, payload: Pick<TOfferedCourse, "faculty" | "days" | "startTime" | "endTime">) => {
     const { faculty, days, startTime, endTime } = payload;
 
@@ -101,7 +114,37 @@ const updateOfferedCourseIntoDB = async (id: string, payload: Pick<TOfferedCours
     return result;
 }
 
+const deleteSemesterRegistrationWithOfferedCoursesIntoDB = async (id: string) => {
+    const session = await startSession();
+    session.startTransaction();
+
+    try {
+        const semesterRegistration = await SemesterRegistration.findById(id).select('status').session(session);
+        if (!semesterRegistration) {
+            throw new AppError(httpStatus.NOT_FOUND, 'Semester registration not found');
+        }
+
+        if (semesterRegistration?.status !== 'UPCOMING') {
+            throw new AppError(httpStatus.BAD_REQUEST, `Cannot delete registration as it is not in ${semesterRegistration.status} status`);
+        }
+
+        await OfferedCourse.deleteMany({ semesterRegistration: id }).session(session);
+
+        const result = await SemesterRegistration.findByIdAndDelete(id).session(session);
+
+        await session.commitTransaction();
+        return result;
+    } catch (err: any) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new Error(err);
+    }
+};
+
 export const OfferedCourseServices = {
     createOfferedCourseIntoDB,
-    updateOfferedCourseIntoDB
+    getAllOfferedCourseFromDB,
+    getSingleOfferedCourseFromDB,
+    updateOfferedCourseIntoDB,
+    deleteSemesterRegistrationWithOfferedCoursesIntoDB
 }
