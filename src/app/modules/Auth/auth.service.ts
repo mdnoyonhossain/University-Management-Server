@@ -5,23 +5,25 @@ import { TLoginUser } from "./auth.interface";
 import bcrypt from "bcrypt";
 
 const loginUser = async (payload: TLoginUser) => {
-    const isUserExists = await User.findOne({ id: payload?.id });
-    if (!isUserExists) {
+    const user = await User.isUserExistsByCustomId(payload?.id);
+
+    if (!user) {
         throw new AppError(httpStatus.NOT_FOUND, "This user is not found!");
     }
 
-    const isUserDeleted = isUserExists?.isDeleted;
+    const isUserDeleted = user?.isDeleted;
     if (isUserDeleted) {
         throw new AppError(httpStatus.FORBIDDEN, "This user is Deleted!");
     }
 
-    const userStatus = isUserExists?.status;
+    const userStatus = user?.status;
     if (userStatus === "blocked") {
         throw new AppError(httpStatus.FORBIDDEN, "This user is Blocked");
     }
 
-    const isPasswordMatched = await bcrypt.compare(payload?.password, isUserExists?.password);
-    console.log(isPasswordMatched);
+    if (!await User.isPasswordMatched(payload?.password, user?.password)) {
+        throw new AppError(httpStatus.FORBIDDEN, "Password do not Matched!");
+    }
 }
 
 export const AuthServices = {
