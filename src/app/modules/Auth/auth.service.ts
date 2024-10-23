@@ -2,7 +2,8 @@ import httpStatus from "http-status";
 import AppError from "../../errors/AppError";
 import { User } from "../user/user.model";
 import { TLoginUser } from "./auth.interface";
-import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import config from "../../config";
 
 const loginUser = async (payload: TLoginUser) => {
     const user = await User.isUserExistsByCustomId(payload?.id);
@@ -23,6 +24,18 @@ const loginUser = async (payload: TLoginUser) => {
 
     if (!await User.isPasswordMatched(payload?.password, user?.password)) {
         throw new AppError(httpStatus.FORBIDDEN, "Password do not Matched!");
+    }
+
+    const jwtPayload = {
+        userId: user?.id,
+        role: user?.role
+    }
+
+    const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, { expiresIn: config.jwt_access_expires_in });
+
+    return {
+        accessToken,
+        needsPasswordChange: user?.needsPasswordChange
     }
 }
 
