@@ -17,13 +17,14 @@ const loginUser = catchAsync(async (req, res) => {
 
 const changePassword = catchAsync(async (req, res) => {
     const user = req.user;
-    const result = await AuthServices.changePasswordIntoDB(user, userPassword);
+    const { ...passwordData } = req.body;
+    const result = await AuthServices.changePasswordIntoDB(user, passwordData);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: "User Password Changed Successfully!",
-        data: null
+        data: result
     })
 })
 
