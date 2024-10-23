@@ -80,7 +80,42 @@ const changePasswordIntoDB = async (userData: JwtPayload, payload: TChangePasswo
     return null;
 }
 
+const refreshToken = async (token: string) => {
+    const decoded = jwt.verify(token, config.jwt_refrest_secret as string) as JwtPayload;
+
+    const user = await User.isUserExistsByCustomId(decoded?.userId);
+
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, "User not found. The account associated with this token no longer exists. Please sign up or contact support for assistance.");
+    }
+
+    if (user?.isDeleted) {
+        throw new AppError(httpStatus.FORBIDDEN, "This user account has been deleted. If this was a mistake, please contact support.");
+    }
+
+    if (user?.status === "blocked") {
+        throw new AppError(httpStatus.FORBIDDEN, "This user account is currently blocked. Please contact support for further information.");
+    }
+
+    if (user?.passwordChangedAt && User.isJWTIssudeBeforePasswordChanged(user.passwordChangedAt, decoded?.iat as number)) {
+        throw new AppError(httpStatus.UNAUTHORIZED, "Your token is no longer valid because your password was changed. Please log in again with your updated credentials.");
+    }
+
+    const jwtPayload = {
+        userId: user?.id,
+        role: user?.role
+    }
+
+    const accessToken = createToken(jwtPayload, config.jwt_access_secret as string, config.jwt_access_expires_in as string);
+
+    return {
+        accessToken
+    }
+};
+
+
 export const AuthServices = {
     loginUser,
-    changePasswordIntoDB
+    changePasswordIntoDB,
+    refreshToken
 }
