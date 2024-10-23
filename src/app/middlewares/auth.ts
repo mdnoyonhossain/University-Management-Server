@@ -1,10 +1,11 @@
 import httpStatus from "http-status";
 import AppError from "../errors/AppError";
 import catchAsync from "../utils/catchAsync";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config";
+import { TUserRole } from "../modules/user/user.interface";
 
-const auth = () => {
+const auth = (...allowedRoles: TUserRole[]) => {
     return catchAsync(async (req, res, next) => {
         const token = req.headers.authorization;
         if (!token) {
@@ -16,10 +17,14 @@ const auth = () => {
                 throw new AppError(httpStatus.UNAUTHORIZED, "Invalid token");
             }
 
+            if (allowedRoles && !allowedRoles.includes((decoded as JwtPayload)?.role)) {
+                throw new AppError(httpStatus.UNAUTHORIZED, "Access forbidden: insufficient permissions.");
+            }
+
             req.user = decoded;
             next();
         });
-        
+
     });
 }
 
