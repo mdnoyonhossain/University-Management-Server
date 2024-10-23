@@ -13,14 +13,23 @@ router.get(
     FacultyControllers.getAllFaculties
 );
 
-router.get('/:id', FacultyControllers.getSingleFaculty);
+router.get(
+    '/:id',
+    auth(USER_ROLE.admin, USER_ROLE.faculty),
+    FacultyControllers.getSingleFaculty
+);
 
 router.patch(
     '/:id',
+    auth(USER_ROLE.admin, USER_ROLE.faculty),
     validateRequest(facultyValidations.updateFacultyValidationSchema),
     FacultyControllers.updateFaculty
 );
 
-router.delete('/:id', FacultyControllers.deleteFaculty);
+router.delete(
+    '/:id',
+    auth(USER_ROLE.admin, USER_ROLE.faculty),
+    FacultyControllers.deleteFaculty
+);
 
 export const FacultyRoutes = router;
