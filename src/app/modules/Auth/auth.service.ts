@@ -1,11 +1,12 @@
 import httpStatus from "http-status";
 import AppError from "../../errors/AppError";
 import { User } from "../user/user.model";
-import { TChangePassword, TLoginUser } from "./auth.interface";
+import { TChangePassword, TLoginUser, TResetPassword } from "./auth.interface";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../../config";
 import bcrypt from "bcrypt";
 import { createToken } from "./auth.utils";
+import { sendEmail } from "../../utils/sendEmail";
 
 const loginUser = async (payload: TLoginUser) => {
     const user = await User.isUserExistsByCustomId(payload?.id);
@@ -113,9 +114,70 @@ const refreshToken = async (token: string) => {
     }
 };
 
+const forgetPassword = async (userId: string) => {
+    const user = await User.isUserExistsByCustomId(userId);
+
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, "User not found. The account associated with this token no longer exists. Please sign up or contact support for assistance.");
+    }
+
+    if (user?.isDeleted) {
+        throw new AppError(httpStatus.FORBIDDEN, "This user account has been deleted. If this was a mistake, please contact support.");
+    }
+
+    if (user?.status === "blocked") {
+        throw new AppError(httpStatus.FORBIDDEN, "This user account is currently blocked. Please contact support for further information.");
+    }
+
+    const jwtPayload = {
+        userId: user?.id,
+        role: user?.role
+    }
+
+    const resetToken = createToken(jwtPayload, config.jwt_access_secret as string, '10m');
+
+    const resetUILink = `${config.reset_password_ui_link}?id=${user?.id}&token=${resetToken}`;
+    await sendEmail(user, resetUILink);
+}
+
+const resetPassword = async (payload: TResetPassword, token: string) => {
+    const user = await User.isUserExistsByCustomId(payload?.id);
+
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    if (user?.isDeleted) {
+        throw new AppError(httpStatus.FORBIDDEN, "This user account has been deleted. If this was a mistake, please contact support.");
+    }
+
+    if (user?.status === "blocked") {
+        throw new AppError(httpStatus.FORBIDDEN, "This user account is currently blocked. Please contact support for further information.");
+    }
+
+    const decoded = jwt.verify(token, config.jwt_access_secret as string) as JwtPayload;
+
+    if (!payload?.id !== decoded?.userId) {
+        throw new AppError(httpStatus.FORBIDDEN, "You are Forbidden");
+    }
+
+    const newHashedPassword = await bcrypt.hash(payload?.newPassword, Number(config.bcrypt_salt_round))
+
+    await User.findOneAndUpdate(
+        { id: decoded?.userId, role: decoded?.role },
+        {
+            password: newHashedPassword,
+            needsPasswordChange: false,
+            passwordChangedAt: new Date()
+        },
+        { new: true, runValidators: true }
+    );
+}
 
 export const AuthServices = {
     loginUser,
     changePasswordIntoDB,
-    refreshToken
+    refreshToken,
+    forgetPassword,
+    resetPassword
 }
