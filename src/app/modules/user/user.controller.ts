@@ -2,12 +2,11 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { UserServices } from './user.service';
-import AppError from '../../errors/AppError';
 
 const createStudent = catchAsync(async (req, res) => {
     const { password, student: studentData } = req.body;
-
-    const result = await UserServices.createStudentIntoDB(password, studentData);
+    const file = req.file;
+    const result = await UserServices.createStudentIntoDB(file, password, studentData);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -19,8 +18,8 @@ const createStudent = catchAsync(async (req, res) => {
 
 const createFaculty = catchAsync(async (req, res) => {
     const { password, faculty: facultyData } = req.body;
-
-    const result = await UserServices.createFacultyIntoDB(password, facultyData);
+    const file = req.file;
+    const result = await UserServices.createFacultyIntoDB(file, password, facultyData);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -32,8 +31,8 @@ const createFaculty = catchAsync(async (req, res) => {
 
 const createAdmin = catchAsync(async (req, res) => {
     const { password, admin: adminData } = req.body;
-
-    const result = await UserServices.createAdminIntoDB(password, adminData);
+    const file = req.file;
+    const result = await UserServices.createAdminIntoDB(file, password, adminData);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -63,7 +62,7 @@ const userChangeStatus = catchAsync(async (req, res) => {
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: 'User Change Status succesfully',
+        message: 'Status is updated succesfully',
         data: result,
     });
 })
