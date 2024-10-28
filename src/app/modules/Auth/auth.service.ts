@@ -5,7 +5,7 @@ import { TChangePassword, TLoginUser, TResetPassword } from "./auth.interface";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../../config";
 import bcrypt from "bcrypt";
-import { createToken } from "./auth.utils";
+import { createToken, verifyToken } from "./auth.utils";
 import { sendEmail } from "../../utils/sendEmail";
 
 const loginUser = async (payload: TLoginUser) => {
@@ -82,7 +82,7 @@ const changePasswordIntoDB = async (userData: JwtPayload, payload: TChangePasswo
 }
 
 const refreshToken = async (token: string) => {
-    const decoded = jwt.verify(token, config.jwt_refrest_secret as string) as JwtPayload;
+    const decoded = verifyToken(token, config.jwt_refrest_secret as string);
 
     const user = await User.isUserExistsByCustomId(decoded?.userId);
 
@@ -155,9 +155,9 @@ const resetPassword = async (payload: TResetPassword, token: string) => {
         throw new AppError(httpStatus.FORBIDDEN, "This user account is currently blocked. Please contact support for further information.");
     }
 
-    const decoded = jwt.verify(token, config.jwt_access_secret as string) as JwtPayload;
+    const decoded = verifyToken(token, config.jwt_access_secret as string);
 
-    if (!payload?.id !== decoded?.userId) {
+    if (payload?.id !== decoded?.userId) {
         throw new AppError(httpStatus.FORBIDDEN, "You are Forbidden");
     }
 

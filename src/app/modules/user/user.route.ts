@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post(
     '/create-admin',
-    auth(USER_ROLE.admin),
+    // auth(USER_ROLE.admin),
     validateRequest(AdminValidations.createAdminValidationSchema),
     UserControllers.createAdmin,
 );
@@ -29,6 +29,12 @@ router.post(
     auth(USER_ROLE.admin),
     validateRequest(StudentValidations.createStudentValidationSchema),
     UserControllers.createStudent,
+);
+
+router.get(
+    '/me',
+    auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
+    UserControllers.getMe
 );
 
 export const UserRoutes = router;
