@@ -149,11 +149,9 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
     }
 };
 
-const getMe = async (token: string) => {
-    const decoded = verifyToken(token, config.jwt_access_secret as string);
-    const { userId, role } = decoded;
-
+const getMe = async (userId: string, role: string) => {
     let result = null;
+
     if (role === USER_ROLE.admin) {
         result = await Admin.findOne({ id: userId }).populate("user");
     }
@@ -172,9 +170,15 @@ const getMe = async (token: string) => {
     return result;
 }
 
+const userChangeStatus = async (id: string, payload: { status: string }) => {
+    const result = await User.findByIdAndUpdate(id, payload, { new: true });
+    return result;
+};
+
 export const UserServices = {
     createStudentIntoDB,
     createFacultyIntoDB,
     createAdminIntoDB,
-    getMe
+    getMe,
+    userChangeStatus
 };

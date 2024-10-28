@@ -44,24 +44,34 @@ const createAdmin = catchAsync(async (req, res) => {
 });
 
 const getMe = catchAsync(async (req, res) => {
-    const token = req?.headers?.authorization;
-    if (!token) {
-        throw new AppError(httpStatus.UNAUTHORIZED, "Access denied. No token provided.")
-    }
-
-    const result = await UserServices.getMe(token);
+    const { userId, role } = req.user;
+    const result = await UserServices.getMe(userId, role);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: 'Me succesfully',
+        message: 'User retrived succesfully',
         data: result,
     });
 });
+
+const userChangeStatus = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const statusData = req.body;
+    const result = await UserServices.userChangeStatus(id, statusData);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'User Change Status succesfully',
+        data: result,
+    });
+})
 
 export const UserControllers = {
     createStudent,
     createFaculty,
     createAdmin,
-    getMe
+    getMe,
+    userChangeStatus
 }
