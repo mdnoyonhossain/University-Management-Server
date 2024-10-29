@@ -13,7 +13,7 @@ const createEnrolledCourseIntoDB = async (userId: string, payload: TEnrolledCour
     }
 
     if (isOfferedCourseExists.maxCapacity <= 0) {
-        throw new AppError(httpStatus.BAD_REQUEST, "The course has reached its maximum capacity. Enrollment is no longer available.");
+        throw new AppError(httpStatus.BAD_REQUEST, "The course has reached its maximum capacity. Enrollment is no longer available!");
     }
 
     const student = await Student.findOne({ id: userId }, { _id: 1 });
