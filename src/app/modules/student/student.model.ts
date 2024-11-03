@@ -56,7 +56,7 @@ const studentSchema = new Schema<TStudent, TStudentModel>({
     permanentAddress: { type: String, required: [true, 'Permanent address is required'] },
     guardian: { type: guardianSchema, required: [true, 'Guardian information is required'] },
     localGuardian: { type: localGuardianSchema, required: [true, 'Local guardian information is required'] },
-    profileImg: { type: String },
+    profileImg: { type: String, default: '' },
     admissionSemester: {
         type: Schema.Types.ObjectId,
         ref: "AcademicSemester"
@@ -64,6 +64,10 @@ const studentSchema = new Schema<TStudent, TStudentModel>({
     academicDepartment: {
         type: Schema.Types.ObjectId,
         ref: "AcademicDepartment"
+    },
+    academicFaculty: {
+        type: Schema.Types.ObjectId,
+        ref: "AcademicFaculty"
     },
     isDeleted: { type: Boolean, default: false }
 }, { timestamps: true, toJSON: { virtuals: true } });

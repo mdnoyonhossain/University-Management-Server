@@ -9,7 +9,7 @@ const userSchema = new Schema<TUser, UserModel>({
     password: { type: String, required: true, select: 0 },
     needsPasswordChange: { type: Boolean, default: true },
     passwordChangedAt: { type: Date },
-    role: { type: String, enum: ["super-admin", "admin", "faculty", "student"] },
+    role: { type: String, enum: ["superAdmin", "admin", "faculty", "student"] },
     status: { type: String, enum: ["in-progress", "blocked"], default: "in-progress" },
     isDeleted: { type: Boolean, default: false }
 }, { timestamps: true });

@@ -9,10 +9,7 @@ cloudinary.config({
     api_secret: config.cloudinary_api_secret,
 });
 
-export const sendImageToCloudinary = (
-    imageName: string,
-    path: string,
-): Promise<Record<string, unknown>> => {
+export const sendImageToCloudinary = (imageName: string,path: string): Promise<Record<string, unknown>> => {
     return new Promise((resolve, reject) => {
         cloudinary.uploader.upload(
             path,
