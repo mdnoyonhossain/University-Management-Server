@@ -9,47 +9,47 @@ const router = express.Router();
 
 router.post(
     '/create-course',
-    auth(USER_ROLE.admin),
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     validateRequest(CourseValidations.createCourseValidationSchema),
     CourseController.createCourse
 );
 
 router.get(
     '/',
-    auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
     CourseController.getAllCourses
 );
 
 router.get(
     '/:id',
-    auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
     CourseController.getSingleCourse
 );
 
 router.patch(
     '/:id',
-    auth(USER_ROLE.admin),
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     validateRequest(CourseValidations.updateCourseValidationSchema),
     CourseController.updateCourse
 );
 
 router.put(
     '/:courseId/assign-faculties',
-    auth(USER_ROLE.admin),
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     validateRequest(CourseValidations.facultiesWithCourseValidationSchema),
     CourseController.assingFacultiesWithCourse,
 );
 
 router.delete(
     '/:courseId/remove-faculties',
-    auth(USER_ROLE.admin),
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     validateRequest(CourseValidations.facultiesWithCourseValidationSchema),
     CourseController.removeFacultiesFromCourse,
 );
 
 router.delete(
     '/:id',
-    auth(USER_ROLE.admin),
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     CourseController.deleteCourse
 );
 
