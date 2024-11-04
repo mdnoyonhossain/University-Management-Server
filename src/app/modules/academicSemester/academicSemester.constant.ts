@@ -4,6 +4,6 @@ export const MonthEnum: TMonth[] = ["January", "February", "March", "April", "Ma
 
 export const academicSemesterCodeNameMapper: TAcademicSemesterCodeNameMapper = {
     Autumn: "01",
-    Summar: "02",
+    Summer: "02",
     Fall: "03"
 }

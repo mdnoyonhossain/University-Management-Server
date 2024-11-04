@@ -3,7 +3,7 @@ import { MonthEnum } from "./academicSemester.constant";
 
 const createAcademicSemesterValidationSchema = z.object({
     body: z.object({
-        name: z.enum(["Autumn", "Summar", "Fall"]),
+        name: z.enum(["Autumn", "Summer", "Fall"]),
         code: z.enum(["01", "02", "03"]),
         year: z.string(),
         startMonth: z.enum([...MonthEnum] as [string, ...string[]]),
@@ -13,7 +13,7 @@ const createAcademicSemesterValidationSchema = z.object({
 
 const updateAcademicSemesterValidationSchema = z.object({
     body: z.object({
-        name: z.enum(["Autumn", "Summar", "Fall"]).optional(),
+        name: z.enum(["Autumn", "Summer", "Fall"]).optional(),
         code: z.enum(["01", "02", "03"]).optional(),
         year: z.string().optional(),
         startMonth: z.enum([...MonthEnum] as [string, ...string[]]).optional(),
