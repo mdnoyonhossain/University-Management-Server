@@ -61,6 +61,11 @@ const facultySchema = new Schema<TFaculty, FacultyModel>(
             required: [true, 'Academic Department id is required'],
             ref: 'AcademicDepartment',
         },
+        academicFaculty: {
+            type: Schema.ObjectId,
+            required: [true, 'Academic Faculty is Required'],
+            ref: "AcademicFaculty"
+        },
         isDeleted: { type: Boolean, default: false },
     }, { toJSON: { virtuals: true } });
 
