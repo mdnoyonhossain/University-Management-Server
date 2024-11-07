@@ -10,6 +10,7 @@ import { Faculty } from "../Faculty/faculty.model";
 import { hasTimeConflict } from "./offeredCourse.utils";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { startSession } from "mongoose";
+import { Student } from "../student/student.model";
 
 const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
     const { semesterRegistration, academicFaculty, academicDepartment, course, faculty, section, days, startTime, endTime } = payload;
@@ -69,8 +70,25 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
 
 const getAllOfferedCourseFromDB = async (query: Record<string, unknown>) => {
     const offeredCourseQuery = await new QueryBuilder(OfferedCourse.find(), query).filter().sort().paginate().fields();
+
     const result = await offeredCourseQuery.modelQuery;
-    return result;
+    const meta = await offeredCourseQuery.countTotal();
+
+    return {
+        meta,
+        result
+    }
+}
+
+const getMyOfferedCourse = async (userId: string) => {
+    const student = await Student.findOne({ id: userId });
+    if (!student) {
+        throw new AppError(httpStatus.NOT_FOUND, "User Not Found!");
+    }
+
+    const currentOngoingSemester = await SemesterRegistration.findOne({ status: "ONGOING" });
+
+    return currentOngoingSemester;
 }
 
 const getSingleOfferedCourseFromDB = async (id: string) => {
@@ -144,6 +162,7 @@ const deleteSemesterRegistrationWithOfferedCoursesIntoDB = async (id: string) =>
 export const OfferedCourseServices = {
     createOfferedCourseIntoDB,
     getAllOfferedCourseFromDB,
+    getMyOfferedCourse,
     getSingleOfferedCourseFromDB,
     updateOfferedCourseIntoDB,
     deleteSemesterRegistrationWithOfferedCoursesIntoDB
