@@ -9,10 +9,19 @@ import { TAdmin } from './admin.interface';
 import { Admin } from './admin.model';
 
 const getAllAdminsFromDB = async (query: Record<string, unknown>) => {
-    const adminQuery = new QueryBuilder(Admin.find(), query).search(AdminSearchableFields).filter().sort().paginate().fields();
+    const adminQuery = new QueryBuilder(Admin.find(), query)
+        .search(AdminSearchableFields)
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
 
     const result = await adminQuery.modelQuery;
-    return result;
+    const meta = await adminQuery.countTotal();
+    return {
+        result,
+        meta,
+    };
 };
 
 const getSingleAdminFromDB = async (id: string) => {
