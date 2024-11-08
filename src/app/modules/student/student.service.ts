@@ -8,21 +8,26 @@ import { StudentSearchAbleFields } from "./student.constant";
 import QueryBuilder from "../../builder/QueryBuilder";
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-    const studentQuery = new QueryBuilder(Student.find().populate('user').populate('admissionSemester').populate({
-        path: 'academicDepartment',
-        populate: {
-            path: 'academicFaculty'
-        }
-    }), query).search(StudentSearchAbleFields).filter().sort().paginate().fields();
+    const studentQuery = new QueryBuilder(Student.find()
+        .populate('user')
+        .populate('admissionSemester')
+        .populate('academicDepartment academicFaculty'),
+        query,
+    )
+        .search(StudentSearchAbleFields)
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
 
-    const result = await studentQuery.modelQuery;
     const meta = await studentQuery.countTotal();
+    const result = await studentQuery.modelQuery;
 
     return {
         meta,
-        result
-    }
-}
+        result,
+    };
+};
 
 const getSingleStudentFromDB = async (id: string) => {
     const result = await Student.findById(id).populate('admissionSemester').populate({
