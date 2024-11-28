@@ -69,4 +69,9 @@ const facultySchema = new Schema<TFaculty, FacultyModel>(
         isDeleted: { type: Boolean, default: false },
     }, { toJSON: { virtuals: true } });
 
+// vartual
+facultySchema.virtual('fullName').get(function () {
+    return `${this?.name?.firstName} ${this?.name?.lastName} ${this?.name?.lastName}`;
+})
+
 export const Faculty = model<TFaculty, FacultyModel>('Faculty', facultySchema);
