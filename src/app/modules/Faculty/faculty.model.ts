@@ -71,7 +71,7 @@ const facultySchema = new Schema<TFaculty, FacultyModel>(
 
 // vartual
 facultySchema.virtual('fullName').get(function () {
-    return `${this?.name?.firstName} ${this?.name?.lastName} ${this?.name?.lastName}`;
+    return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
 })
 
 export const Faculty = model<TFaculty, FacultyModel>('Faculty', facultySchema);
