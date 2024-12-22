@@ -182,6 +182,13 @@ const getMyEnrolledCoursesFromDB = async (studentId: string, query: Record<strin
     };
 };
 
+const getMySingleEnrolledCoursesFromDB = async (id: string) => {
+    const result = await EnrolledCourse.findById(id)
+    .populate('semesterRegistration academicSemester academicFaculty academicDepartment offeredCourse course student faculty')
+
+    return result;
+}
+
 const updateEnrolledCourseMarksIntoDB = async (facultyId: string, payload: Partial<TEnrolledCourse>) => {
     const { semesterRegistration, offeredCourse, student, courseMarks } = payload;
 
@@ -252,5 +259,6 @@ export const EnrolledCourseServices = {
     createEnrolledCourseIntoDB,
     getAllEnrolledCoursesFromDB,
     getMyEnrolledCoursesFromDB,
+    getMySingleEnrolledCoursesFromDB,
     updateEnrolledCourseMarksIntoDB
 }
