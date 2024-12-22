@@ -244,7 +244,7 @@ const getMyOfferedCoursesFromDB = async (userId: string, query: Record<string, u
 };
 
 const getSingleOfferedCourseFromDB = async (id: string) => {
-    const result = await OfferedCourse.findById(id);
+    const result = await OfferedCourse.findById(id).populate('academicDepartment academicFaculty academicSemester course faculty semesterRegistration');
     return result;
 }
 
