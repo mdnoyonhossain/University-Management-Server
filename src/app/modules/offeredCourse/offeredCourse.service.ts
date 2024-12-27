@@ -69,7 +69,8 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
 }
 
 const getAllOfferedCourseFromDB = async (query: Record<string, unknown>) => {
-    const offeredCourseQuery = await new QueryBuilder(OfferedCourse.find(), query).filter().sort().paginate().fields();
+    const offeredCourseQuery = await new QueryBuilder(OfferedCourse.find().populate('academicDepartment academicFaculty academicSemester course faculty semesterRegistration'),
+        query).filter().sort().paginate().fields();
 
     const result = await offeredCourseQuery.modelQuery;
     const meta = await offeredCourseQuery.countTotal();
