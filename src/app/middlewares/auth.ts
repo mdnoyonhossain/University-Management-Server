@@ -12,7 +12,7 @@ const auth = (...allowedRoles: TUserRole[]) => {
         if (!token) {
             throw new AppError(httpStatus.UNAUTHORIZED, "Access denied. No token provided.")
         }
-
+        // const decoded = jwt.verify(token, config.jwt_access_secret as string) as JwtPayload;
         let decoded;
 
         try {
